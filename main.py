@@ -1,12 +1,15 @@
 from steam import SteamAPI
 from steam import TwitchAPI
 from steam import APICache
+import json
 
+with open('user.conf', 'r') as file:
+    config = json.load(file)
 
-api_key = "xxx"
-steamid = 'xxx'
-client_id = 'xxx'
-client_secret = 'xxx'
+api_key = config['api_key']
+steamid = config['steamid']
+client_id = config['client_id']
+client_secret = config['client_secret']
 
 c = APICache()
 sapi = SteamAPI(api_key, c)
