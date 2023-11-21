@@ -1,6 +1,6 @@
-from steam import SteamAPI
-from steam import TwitchAPI
-from steam import APICache
+from API_loading import SteamAPI
+from API_loading import TwitchAPI
+from API_loading import APICache
 import json
 
 with open('user.conf', 'r') as file:
