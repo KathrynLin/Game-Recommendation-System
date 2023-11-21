@@ -78,8 +78,18 @@ I will implement a graph data structure where each game will be represented as a
 
 The screenshot below is used to evalued the cosine similarity between two paragraphs.
 
-<img src="/Users/dennyzheng/Desktop/lfq/si/project/progress.png" alt="progress" style="zoom:50%;" />
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
+def calculate_similarity_score(text1, text2):
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform([text1, text2])
+    
+    similarity_score = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
+
+    return similarity_score
+```
 
 
 ## Interaction and presentation plans
