@@ -1,6 +1,7 @@
-# Checkpoint report 
+# SI507 Final Project Report - Game Recommendation System
 
-*Fangqing Lin*
+Fangqing Lin  
+Unique name: *lfqing*
 
 
 
@@ -8,12 +9,13 @@
 
 https://github.com/KathrynLin/SI507-FinalProject
 
+The source code files are also included in the submission folder.
 
 
 ## Data source
 
 ### Steam data
-
+<span style="color:red">Origin, data summary and cache should be updated!</span>
 - **Origin:** Steam data is obtained using the Steam Web API (https://developer.valvesoftware.com/wiki/Steam_Web_API). Specifically, AppDetails is used to get detail description of an app, GetOwnedGames is used to get a list of games a user owns, and GetFriendList is used to get a list of friends of a user.
 
 - **Format:** JSON
@@ -72,28 +74,132 @@ https://github.com/KathrynLin/SI507-FinalProject
 
 
 
+### Obtaining API Access for Twitch and Steam Data
+
+1. **Accessing Steam API**
+    1. **Create a Steam Account**: If you don’t have a Steam account, create one at [Steam](https://store.steampowered.com/).
+
+    2. **Register for Steamworks**:
+    - Go to [Steamworks](https://partner.steamgames.com/) and sign in with your Steam account.
+    - Complete the sign-up process for Steamworks.
+
+    3. **Obtain an API Key**:
+    - Navigate to the [Steam Community Developer Page](https://steamcommunity.com/dev/apikey).
+    - Enter your domain name (or use `localhost` for development purposes) and agree to the terms of use.
+    - Your API Key will be generated. This key is required to make requests to the Steam API.
+
+    4. **Making API Requests**:
+    - Use the API Key in your requests to the Steam API.
+    - The API Key can be passed as a query parameter in your API calls.
+
+2. **Accessing Twitch API**
+    1. **Create a Twitch Account**: If you don't already have one, create a Twitch account at [Twitch](https://www.twitch.tv/).
+
+    2. **Register Your Application**:
+    - Go to the [Twitch Developers Console](https://dev.twitch.tv/console).
+    - Click on “Your Console” and navigate to “Applications”.
+    - Select “+ Register Your Application”.
+    - Fill in the required details:
+        - **Name**: Provide a name for your application.
+        - **OAuth Redirect URLs**: This is required for OAuth authentication. For a CLI application, you can use `http://localhost`.
+        - **Category**: Select an appropriate category (e.g., “Application Integration”).
+    - Click “Create” to register your application.
+
+    3. **Get Client ID and Secret**:
+    - Once the application is registered, you will receive a **Client ID**.
+    - Generate a **Client Secret** by clicking “New Secret”.
+    - Note down both the Client ID and Client Secret; these are required to authenticate your application with the Twitch API.
+
+    4. **Authenticate Your Application**:
+    - Use the Client ID and Client Secret to obtain an OAuth token.
+    - Include this token in the header of your API requests to authenticate.
+3. **Integrating API Keys into Code**
+
+    Once you have obtained the API keys for Twitch and Steam, and your Steam ID, you need to store them in a configuration file (`key.conf`) and use them in your application. This file is a JSON file that contains the necessary credentials for accessing the APIs.
+
+    #### Structure of `key.conf`
+    ```json
+    {
+        "api_key": "<Your_Steam_API_Key>",
+        "steam_id": "<Your_Steam_ID>",
+        "twitch_client_id": "<Your_Twitch_Client_ID>",
+        "twitch_client_secret": "<Your_Twitch_Client_Secret>"
+    }
+    ```
+    Replace `<Your_Steam_API_Key>`,  `<Your_Twitch_Client_ID>`, and `<Your_Twitch_Client_Secret>` with the actual keys you obtained from the Steam and Twitch developer portals.  
+    You can replace `<Your_Steam_ID>` with your Steam ID, or you can use the Steam ID of any other user.
+
+
 ## Data structure
 
+<span style="color:red">This part should be updated!</span>
 I will implement a graph data structure where each game will be represented as a node. The connections between nodes will be established based on similarity measures, such astextual similarity of descriptions, and sentiment analysis of user reviews. With the graph constructed, I will develop a recommendation algorithm that utilizes graph traversal techniques based on breadth-first search (BFS) or depth-first search (DFS), to explore the graph and identify games that are similar to a user's preferences. 
 
-The screenshot below is used to evalued the cosine similarity between two paragraphs.
-
-```python
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-
-def calculate_similarity_score(text1, text2):
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform([text1, text2])
-    
-    similarity_score = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
-
-    return similarity_score
+### Sampe json style of cache data
+```json
+{
+    "user_friend_graph": {
+        "user1": [
+            "user2",
+            "user3",
+            "..."
+        ]
+    },
+    "user_game_mapping":{
+        "user1": [
+            {
+                "appid": "app1",
+                "playtime_forever": "number"
+            }
+        ]
+    },
+    "game_detail":{
+        "app1": {
+            "..." : "...",
+            "genres": [
+                {
+                    "id": "id1",
+                    "description": "description1"
+                }
+            ],
+            "...": "..."
+        }
+    }
+}
 ```
 
+## Interaction and Presentation Options
 
-## Interaction and presentation plans
+### User-Facing Capabilities
 
-The game recommendation system will be implemented as a web application implemented with Flask. Users can enter their Steam ID and a graph of recommended games will be shown on the application. On each node, users can gain information such as  title, description, genre, release date, user reviews, Twitch streams and videos. 
+Our Game Recommendation System offers an intuitive and straightforward command-line interface that allows users to interactively explore various aspects of gaming preferences and social connections within a gaming community. The system leverages data from the Steam gaming platform to provide personalized recommendations and insights. Users have several options for selecting and displaying data:
 
-The game recommendation system will provide various interaction functionalities to enhance user engagement and improve recommendation accuracy. These interactions will be facilitated through the web application. Users will be able to explore a list of popular live streams on Twitch, based on the games in their Steam library as well as the games recommended to them. The system will generate personalized game recommendations based on a user's profile, playtime history, preferred genres, friends' activities, and popular games within their network. 
+1. **Display Similar Users**: Users can view a list of top similar users within their friend network as well as the similarity scores with them. This feature identifies users with similar gaming interests and play patterns, facilitating community building and game discovery.
+
+2. **Display Recommended Games**: The system presents a list of games that are most played by the user's most similar friend. This feature helps users discover new games based on their friends' gaming preferences.
+
+    - **Integration with Twitch**: For each recommended game, users can view the top Twitch streams, which are all live data, providing the name, title, and number of viewers of the stream. Based on this, users can choose to view the stream and get a sense of the game before deciding to play it.
+ 
+
+3. **Display Recommended Game Genres**: Users can explore a variety of game genres recommended based on their and their friends' gaming habits. This option will show the genres as well as the score measuring the relevance of the genre to the user's gaming preferences. This aids in uncovering new gaming categories that align with their interests.
+
+
+### User Interaction Instructions
+
+To interact with the Game Recommendation System, users follow these simple steps:
+
+1. **Start the Program**: Run the program from the command line. The main menu will be displayed, presenting various options.
+
+2. **Navigate the Menu**: Use the keyboard to enter the number corresponding to the desired action (e.g., '1' for displaying similar users) and press 'Enter'.
+
+3. **View Results**: After selecting an option, the results (such as similar users or game recommendations) will be displayed in the command line.
+
+4. **Explore Further**: For recommended games, users can opt to view related Twitch streams. They simply need to enter the number corresponding to the game of interest.
+
+5. **Exit the Program**: To exit, users can choose the 'Exit' option from the main menu.
+
+Python libraries are utilized for processing and analyzing gaming data from Steam. 
+    - numpy, json, os, requests, deque (from collections), re.
+
+Through this CLI, the Game Recommendation System offers a user-friendly and effective way to explore gaming preferences and social connections.
+
