@@ -1,4 +1,6 @@
-*.json
+*.pdf
 __pycache__
+.DS_Store
 *.ipynb
-user.conf
+*.json
+key.conf
