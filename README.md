@@ -186,9 +186,9 @@ D -->|Similarity| E
 
 Code for building the graph is in `graph.py`, and the original json file supporting the graph is in `api_cache.py`.  Screenshots are shown below:
 
-<img src="/Users/dennyzheng/Desktop/lfq/si/final-project/graph.png" alt="graph" style="zoom:50%;" />
+<img src="graph.png" alt="graph" style="zoom:50%;" />
 
-<img src="/Users/dennyzheng/Desktop/lfq/si/final-project/data.png" alt="data" style="zoom:50%;" />
+<img src="data.png" alt="data" style="zoom:50%;" />
 
 ## Interaction and Presentation Options
 
