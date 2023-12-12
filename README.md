@@ -1,6 +1,6 @@
 # SI507 Final Project Report - Game Recommendation System
 
-Fangqing Lin  
+Fangqing Lin 
 Unique name: *lfqing*
 
 
@@ -9,13 +9,16 @@ Unique name: *lfqing*
 
 https://github.com/KathrynLin/SI507-FinalProject
 
-The source code files are also included in the submission folder.
+The code is also included in the submission folder.
+
+Python libraries are utilized for processing and analyzing gaming data from Steam. 
+
+   - `numpy`, `json`, `os`, `requests`, `deque` (`from collections`), `re`.
 
 
 ## Data source
 
 ### Steam data
-<span style="color:red">Origin, data summary and cache should be updated!</span>
 - **Origin:** Steam data is obtained using the Steam Web API (https://developer.valvesoftware.com/wiki/Steam_Web_API). Specifically, AppDetails is used to get detail description of an app, GetOwnedGames is used to get a list of games a user owns, and GetFriendList is used to get a list of friends of a user.
 
 - **Format:** JSON
@@ -32,30 +35,25 @@ The source code files are also included in the submission folder.
           if os.path.exists(self.cache_file):
               with open(self.cache_file, 'r') as file:
                   return json.load(file)
-          return {'users': {}, 'apps': {}, 'maps': {}, 'videos': {}}
+          return {}
       
-      def get(self, key, field):
-          if field not in self.data:
-              print("Invalid field to get.")
+      def get(self, key):
+          if key not in self.data:
               return None 
-          if key in self.data[field]:
-              return self.data[field][key]
           else:
-              return None
+              return self.data[key]
   
-      def set(self, key, value, field):
-          if field not in self.data:
-              print("Invalid field to set.")
-              return None 
-          self.data[field][key] = value
+  
+      def set(self, key, value):
+          self.data[key] = value
   
       def save_cache(self):
           with open(self.cache_file, 'w') as file:
               json.dump(self.data, file, indent=4)
   ```
-
+  
   Caching is important because retrieving information with api is slow (1 second per access). By storing the retrieved information into the cache, no repeated api access is needed.
-
+  
 - **Data summary:** 
 
   - *# records available:* All games on Steam Store, over 50,000.
@@ -64,15 +62,21 @@ The source code files are also included in the submission folder.
 
 ### Twitch data
 
-- **Origin:** Twitch data is obtained using the Twitch API (https://dev.twitch.tv/docs/api/). Specifically, SearchCategory is used to search games by names, and GetVideos is used to get a list of videos of a given game.
+- **Origin:** Twitch data is obtained using the Twitch API (https://dev.twitch.tv/docs/api/). Specifically, `https://api.twitch.tv/helix` is used as the base API URL.
 - **Format:** JSON
-- **Cache:** Cache is the same as in "Steam data" section.
+- **Cache:** Since twich streams are real-time, no cache is needed.
 - **Data summary:** 
   - *# records available:* All games on Twitch, over 10,000.
   - *# records retrieved:* Same order as `related_games`, roughly 270.
-  - *Description:* The `maps` field in the cache file contains mappings from steam app ID to Twitch app ID. The `videos` field containes a list of videos of a given game (indicated by the key) on twitch.
-
-
+  - *Description:* Each field is described as follows:
+    - `user_name`: The username of the streamer.
+    - `title`: The title or description of the stream.
+    - `viewer_count`: The number of viewers currently watching the stream.
+    - `language`: The language in which the stream is being broadcasted.
+    - `started_at`: The timestamp indicating when the stream started.
+    - `thumbnail_url`: The URL of the thumbnail image for the stream.
+    - `game_id`: The ID of the game being streamed.
+    - `game_name`: The name of the game being streamed.
 
 ### Obtaining API Access for Twitch and Steam Data
 
@@ -126,14 +130,26 @@ The source code files are also included in the submission folder.
         "twitch_client_secret": "<Your_Twitch_Client_Secret>"
     }
     ```
-    Replace `<Your_Steam_API_Key>`,  `<Your_Twitch_Client_ID>`, and `<Your_Twitch_Client_Secret>` with the actual keys you obtained from the Steam and Twitch developer portals.  
+    Replace `<Your_Steam_API_Key>`,  `<Your_Twitch_Client_ID>`, and `<Your_Twitch_Client_Secret>` with the actual keys you obtained from the Steam and Twitch developer portals. 
     You can replace `<Your_Steam_ID>` with your Steam ID, or you can use the Steam ID of any other user.
 
 
 ## Data structure
 
-<span style="color:red">This part should be updated!</span>
-I will implement a graph data structure where each game will be represented as a node. The connections between nodes will be established based on similarity measures, such astextual similarity of descriptions, and sentiment analysis of user reviews. With the graph constructed, I will develop a recommendation algorithm that utilizes graph traversal techniques based on breadth-first search (BFS) or depth-first search (DFS), to explore the graph and identify games that are similar to a user's preferences. 
+The game recommendation system utilizes a graph data structure to represent the relationships between users and games. The graph consists of two types of nodes: *user nodes* and *game nodes*. User nodes represent individual users, while game nodes represent specific games. The edges in the graph signify friendships between users or ownership of games by users. An edge between two user nodes indicates a friendship or connection between those users, implying that they have similar gaming preferences or interests. Similarly, an edge between a user node and a game node signifies that the user owns or has played the corresponding game. By organizing the data in this graph structure, the recommendation system can leverage these connections to provide personalized recommendations. It can identify games that are popular among a user's friends or recommend games based on the ownership patterns of similar users. Below is an illustration of the graph structure:
+
+```mermaid
+graph LR
+
+A(User 1) -->|Friend| B(User 2)
+A -->|Friend| C(User 3)
+A -->|Owns| D(Game 1)
+B -->|Friend| C
+B -->|Owns| E(Game 2)
+C -->|Owns| D
+C -->|Owns| E
+D -->|Similarity| E
+```
 
 ### Sampe json style of cache data
 ```json
@@ -168,6 +184,12 @@ I will implement a graph data structure where each game will be represented as a
 }
 ```
 
+Code for building the graph is in `graph.py`, and the original json file supporting the graph is in `api_cache.py`.  Screenshots are shown below:
+
+<img src="/Users/dennyzheng/Desktop/lfq/si/final-project/graph.png" alt="graph" style="zoom:50%;" />
+
+<img src="/Users/dennyzheng/Desktop/lfq/si/final-project/data.png" alt="data" style="zoom:50%;" />
+
 ## Interaction and Presentation Options
 
 ### User-Facing Capabilities
@@ -179,7 +201,7 @@ Our Game Recommendation System offers an intuitive and straightforward command-l
 2. **Display Recommended Games**: The system presents a list of games that are most played by the user's most similar friend. This feature helps users discover new games based on their friends' gaming preferences.
 
     - **Integration with Twitch**: For each recommended game, users can view the top Twitch streams, which are all live data, providing the name, title, and number of viewers of the stream. Based on this, users can choose to view the stream and get a sense of the game before deciding to play it.
- 
+
 
 3. **Display Recommended Game Genres**: Users can explore a variety of game genres recommended based on their and their friends' gaming habits. This option will show the genres as well as the score measuring the relevance of the genre to the user's gaming preferences. This aids in uncovering new gaming categories that align with their interests.
 
@@ -198,8 +220,8 @@ To interact with the Game Recommendation System, users follow these simple steps
 
 5. **Exit the Program**: To exit, users can choose the 'Exit' option from the main menu.
 
-Python libraries are utilized for processing and analyzing gaming data from Steam. 
-    - numpy, json, os, requests, deque (from collections), re.
-
 Through this CLI, the Game Recommendation System offers a user-friendly and effective way to explore gaming preferences and social connections.
 
+## Demo Video Link
+
+https://youtu.be/gI_GyNTikNs
